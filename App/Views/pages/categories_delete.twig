@@ -6,14 +6,13 @@
             <div class="form-control">
                 <p>Are you sure you want to delete the following category?</p>
             </div>
-<!-- RMBP!!! user: {{ username }} hash: {{passwordHash}}-->
             <div class="form-control">
                 <div class="card">
                     <h2>{{ data.title }}</h2>
                     <p>{{ data.description }}</p>
                 </div>
             </div>
-            
+
             {% if products %}
             <div class="form-control">
                 <p style="color:#FF0000">Deleting this category will also <b>delete</b> all the products in this category. List of products that will be <b>deleted:</b></p>

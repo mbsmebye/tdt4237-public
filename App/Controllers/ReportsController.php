@@ -80,6 +80,9 @@ class ReportsController extends Controller {
     }
 
     public function delete($id) {
+      $checkModel = new ReportsModel();
+      $data = $checkModel->find($id);
+      if ($data && $data->user === $_SESSION['auth']){
         if(!empty($_POST)) {
             $model = new ReportsModel();
             $file  = $model->find($id)->file;
@@ -99,6 +102,8 @@ class ReportsController extends Controller {
                 'data'        => $data
             ]);
         }
+      }
+      else{App::error403();}
     }
 
 }

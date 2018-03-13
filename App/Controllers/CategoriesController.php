@@ -28,6 +28,8 @@ class CategoriesController extends Controller {
         if(!empty($_POST)) {
             $title       = isset($_POST['title']) ? $_POST['title'] : '';
             $description = isset($_POST['description']) ? $_POST['description'] : '';
+            $title = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+            $description = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
 
             $validator = new FormValidator();
             $validator->notEmpty('title', $title, "Your title must not be empty");
@@ -69,9 +71,15 @@ class CategoriesController extends Controller {
     }
 
     public function edit($id) {
+      $checkModel = new CategoriesModel();
+      $data = $checkModel->find($id);
+      if ($data && $data->user === $_SESSION['auth']){
+
         if(!empty($_POST)) {
             $title       = isset($_POST['title']) ? $_POST['title'] : '';
             $description = isset($_POST['description']) ? $_POST['description'] : '';
+            $title = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+            $description = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
 
             $validator = new FormValidator();
             $validator->notEmpty('title', $title, "Your title must not be empty");
@@ -127,17 +135,23 @@ class CategoriesController extends Controller {
                 'data'        => $data
             ]);
         }
+      }
+      else {App::error403();}
     }
 
     public function delete($id) {
+      $checkModel = new CategoriesModel();
+      $data = $checkModel->find($id);
+
+      if ($data && $data->user === $_SESSION['auth']){
         $model2 = new ProductsModel($_COOKIE['user']);
         $products = $model2->getProductsByCategoryId($id);
-        
+
         if(!empty($_POST)) {
             foreach($products as $product){
                 $model2->delete($product->id);
             }
-            
+
             $model = new CategoriesModel();
             $model->delete($id);
             App::redirect('categories');
@@ -154,6 +168,8 @@ class CategoriesController extends Controller {
                 'products'    => $products
             ]);
         }
+      }
+      else {App::error403();}
     }
 
     public function single($id, $slug) {
@@ -173,7 +189,7 @@ class CategoriesController extends Controller {
             App::error();
         }
     }
-    
+
     public function api($id = null) {
         if($id) {
             $model = new CategoriesModel();

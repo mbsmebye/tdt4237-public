@@ -4,25 +4,28 @@ namespace App\Models;
 use \App\System\App;
 
 class Model {
-    
+
     protected $table;
     protected $username;
-    
-    
+
+
     public function __construct(){
         if (isset ($_COOKIE['user'])){ $this->username = $_COOKIE['user'];}
     }
 
     public function all($user = null) {
         if ($user){
-            return $this->query("SELECT * FROM {$this->table} WHERE user = '{$user}'");
+            return $this->query("SELECT * FROM {$this->table} WHERE user = ?", array($user));
+            //return $this->prepare("SELECT * FROM {$this->table} WHERE 'user' = :user", array(":user" => $user));
         }else{
             return $this->query('SELECT * FROM ' . $this->table);
+            //return $this->prepare('SELECT * FROM ' . $this->table);
         }
     }
 
     public function find($id) {
-        return $this->query("SELECT * FROM {$this->table} WHERE id = {$id}", null, true);
+        return $this->query("SELECT * FROM {$this->table} WHERE id = ?", array($id), true);
+        //return $this->prepare("SELECT * FROM {$this->table} WHERE 'id' = :id", array(":id" => {$id}), null, true);
     }
 
     public function update($id, $fields) {
@@ -55,7 +58,7 @@ class Model {
 
         App::getDb()->execute("INSERT INTO {$this->table} SET $sql_part", $attributes);
     }
-    
+
     public function query($statement, $attributes = null, $one = false) {
         if($attributes){
             return App::getDb()->prepare(

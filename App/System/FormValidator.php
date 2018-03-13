@@ -30,6 +30,12 @@ class FormValidator {
         }
     }
 
+    public function validLength($element, $value, $message) {
+        if(strlen("$value") < 8){
+          $this->errors[$element] = $message;
+        }
+    }
+
     public function validUsername($element, $value, $message) {
         if(!preg_match('/[a-z0-9]+/', $value)) {
             $this->errors[$element] = $message;
@@ -54,7 +60,7 @@ class FormValidator {
             }
         }
     }
-    
+
     public function isNumeric($element, $value, $message) {
         if(!is_numeric($value)) {
             $this->errors[$element] = $message;
@@ -81,6 +87,11 @@ class FormValidator {
             if($value['size'] > 1000000) {
                 $this->errors[$element] = "Your media is too big (> 1Mo)";
                 return;
+            }
+            $validTypes = array('image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/tif');
+            if(!in_array($value['type'], $validTypes)){
+              $this->errors[$element] = "File format not supported.";
+              return;
             }
         }
     }

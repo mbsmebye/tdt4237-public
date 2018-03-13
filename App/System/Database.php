@@ -30,6 +30,8 @@ class Database {
     }
 
     public function query($statement, $one = false) {
+        
+
         $req  = $this->getPDO()->query($statement);
 
         if($one) {

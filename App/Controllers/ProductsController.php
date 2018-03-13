@@ -34,14 +34,14 @@ class ProductsController extends Controller {
 
         $model3  = new ReportsModel();
         $reports = $model3->all($_COOKIE['user']);
-        
+
         $model4 = new CommentsModel();
         $comments = $model4->getShoutBox();
         foreach ($comments as $comment){
             $comment->created_at = substr($comment->created_at, 11, 18);
         }
         //echo var_dump($comments);die;
-        
+
         $stats = [
             'value' => $value,
             'count' => $count,
@@ -133,7 +133,7 @@ class ProductsController extends Controller {
         else {
             $model = new CategoriesModel();
             $categories  = $model->all($_COOKIE['user']);
-            
+
             if ($categories){
                 $this->render('pages/products_add.twig', [
                     'title'       => 'Add product',
@@ -153,6 +153,9 @@ class ProductsController extends Controller {
     }
 
     public function edit($id) {
+      $checkModel = new ProductsModel();
+      $data = $checkModel->find($id);
+      if ($data && $data->user === $_SESSION['auth']){
         if(!empty($_POST)) {
             $title       = isset($_POST['title']) ? $_POST['title'] : '';
             $description = isset($_POST['description']) ? $_POST['description'] : '';
@@ -231,9 +234,14 @@ class ProductsController extends Controller {
                 'categories'  => $categories
             ]);
         }
+      }
+      else{App::error403();}
     }
 
     public function delete($id) {
+      $checkModel = new ProductsModel();
+      $data = $checkModel->find($id);
+      if ($data && $data->user === $_SESSION['auth']){
         if(!empty($_POST)) {
             $model = new ProductsModel();
             $file  = $model->find($id)->media;
@@ -253,7 +261,10 @@ class ProductsController extends Controller {
                 'data'        => $data
             ]);
         }
+      }
+      else{App::error403();}
     }
+
 
     public function stats() {
         $model = new ProductsModel();
@@ -277,7 +288,7 @@ class ProductsController extends Controller {
 
         echo json_encode($stats);
     }
-    
+
     public function api($id = null) {
         if($id) {
             $model = new ProductsModel();
@@ -296,9 +307,9 @@ class ProductsController extends Controller {
             echo json_encode($data);
         }
     }
-    
+
     public function viewSQL($id) {
         echo var_dump($this->productRep->find($id)); die;
     }
-    
+
 }

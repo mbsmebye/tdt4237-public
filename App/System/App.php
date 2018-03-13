@@ -83,7 +83,7 @@ class App {
         $controller = new \App\Controllers\Controller();
         $controller->render('pages/404.twig', []);
     }
-    
+
     public static function error403() {
         header("HTTP/1.0 403 Forbidden");
         $controller = new \App\Controllers\Controller();
@@ -96,10 +96,36 @@ class App {
     }
 
     public static function secured() {
-        if(!isset($_SESSION['auth'])) {
-            self::redirect('signin');
-            exit;
+      if (isset($_SESSION['latestAction'])) {
+          $afk = time() - $_SESSION['latestAction'];
+          if ($afk > 900){
+            echo "<script>
+            alert('Session timeout. Please log back in if you wish to continue.');
+            window.location.href='/';
+            </script>";
+            session_destroy();
+            session_unset();
+            //self::redirect('signin');
+          }
+          session_regenerate_id(true);
+          $_SESSION['latestAction'] = time();
+      }
+      if(!empty($_POST['token'])) {
+        if (!hash_equals($_SESSION['token'], $_POST['token'])) {
+          echo "<script>
+          alert('Invalid CSRF-token detected. Ending session.');
+          window.location.href='/';
+          </script>";
+          session_destroy();
+          session_unset();
         }
+      }
+
+
+      if(!isset($_SESSION['auth'])) {
+          self::redirect('signin');
+          exit;
+      }
     }
 
 }
